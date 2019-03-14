@@ -483,7 +483,7 @@ int xtract_mfcc(const double *data, const int N, const void *argv, double *resul
     double* temp;
 
     f = (xtract_mel_filter *)argv;
-    temp = calloc(f->n_filters, sizeof(double));
+    temp = (double *) calloc(f->n_filters, sizeof(double));
     for(filter = 0; filter < f->n_filters; filter++)
     {
         for(n = 0; n < N; n++)
@@ -633,10 +633,10 @@ int xtract_dct(const double *data, const int N, const void *argv, double *result
     if (dct_cos_table == NULL)
     {
         dct_cos_table_dim = N;
-        dct_cos_table = calloc(N, sizeof(double*));
+        dct_cos_table = (double **) calloc(N, sizeof(double*));
         for (n = 0; n < N; ++n)
         {
-            dct_cos_table[n] = calloc(N, sizeof(double));
+            dct_cos_table[n] = (double *) calloc(N, sizeof(double));
             for (m = 1; m <= N; ++m)
             {
                 dct_cos_table[n][m-1] = cos(M_PI * (n / (double)N)*(m - 0.5));
