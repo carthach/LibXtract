@@ -14,7 +14,7 @@ SCENARIO( "F0 is correctly detected for a sine wave", "[xtract_f0]" )
 
     GIVEN( "a 512 sample block with a sample rate of 44100" )
     {
-        uint32_t blocksize = 512;
+        const uint32_t blocksize = 512;
         double samplerate = 44100;
         double result = -1.0;
         double amplitude = 1.0;
@@ -87,7 +87,7 @@ SCENARIO( "F0 is correctly detected for a sine wave", "[xtract_f0]" )
 
     GIVEN( "a 1024 sample block with a sample rate of 44100" )
     {
-        uint32_t blocksize      = 1024;
+        const uint32_t blocksize      = 1024;
         double samplerate       = 44100;
         double result           = -1.0;
         double amplitude        = 1.0;
@@ -290,7 +290,7 @@ SCENARIO( "F0 is correctly detected for a sine wave", "[xtract_f0]" )
 
     GIVEN( "a 1024 sample block with a sample rate of 11025" )
     {
-        uint32_t blocksize      = 1024;
+        const uint32_t blocksize      = 1024;
         double samplerate       = 11025;
         double result           = -1.0;
         double table[blocksize];
@@ -453,7 +453,7 @@ SCENARIO( "F0 is correctly detected for a sine wave", "[xtract_f0]" )
 
     GIVEN( "a 2048 sample block with a sample rate of 44100" )
     {
-        uint32_t blocksize      = 2048;
+        const uint32_t blocksize      = 2048;
         double samplerate       = 44100;
         double result           = -1.0;
         double table[blocksize];
@@ -540,7 +540,7 @@ SCENARIO( "F0 is correctly detected for a sawtooth wave", "[xtract_f0]" )
 
     GIVEN( "a 512 sample block with a sample rate of 44100" )
     {
-        uint32_t blocksize = 512;
+        const uint32_t blocksize = 512;
         double samplerate = 44100;
         double result = -1.0;
         double amplitude = 1.0;
@@ -625,7 +625,7 @@ SCENARIO( "F0 is correctly detected for a sawtooth wave", "[xtract_f0]" )
 
     GIVEN( "a 1024 sample block with a sample rate of 44100" )
     {
-        uint32_t blocksize      = 1024;
+        const uint32_t blocksize      = 1024;
         double samplerate       = 44100;
         double result           = -1.0;
         double amplitude        = 1.0;
@@ -863,7 +863,7 @@ SCENARIO( "F0 is correctly detected for a sawtooth wave", "[xtract_f0]" )
 
     GIVEN( "a 1024 sample block with a sample rate of 11025" )
     {
-        uint32_t blocksize      = 1024;
+        const uint32_t blocksize      = 1024;
         double samplerate       = 11025;
         double result           = -1.0;
         double table[blocksize];
@@ -1000,7 +1000,7 @@ SCENARIO( "F0 is correctly detected for a sawtooth wave", "[xtract_f0]" )
 
     GIVEN( "a 2048 sample block with a sample rate of 44100" )
     {
-        uint32_t blocksize      = 2048;
+        const uint32_t blocksize      = 2048;
         double samplerate       = 44100;
         double result           = -1.0;
         double table[blocksize];
