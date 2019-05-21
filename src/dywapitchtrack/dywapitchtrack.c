@@ -41,6 +41,10 @@
 #define min(x, y) ((x) < (y)) ? (x) : (y)
 #endif
 
+#ifndef DBL_MAX
+#define DBL_MAX 1.79769e+308
+#endif
+
 // returns 1 if power of 2
 int _power2p(int value) {
 	if (value == 0) return 1;
@@ -102,7 +106,7 @@ typedef struct _minmax {
 	struct _minmax *next;
 } minmax;
 
-double _dywapitch_computeWaveletPitch(const double * samples, int startsample, int samplecount) {
+double _dywapitch_computeWaveletPitch(double * samples, int startsample, int samplecount) {
 	double pitchF = 0.0;
 	
 	int i, j;
@@ -131,8 +135,8 @@ double _dywapitch_computeWaveletPitch(const double * samples, int startsample, i
 	
 	{ // compute ampltitudeThreshold and theDC
 		//first compute the DC and maxAMplitude
-		double maxValue = 0.0;
-		double minValue = 0.0;
+		double maxValue = -DBL_MAX;
+		double minValue = DBL_MAX;
 		for (i = 0; i < samplecount;i++) {
 			si = sam[i];
 			theDC = theDC + si;
@@ -171,12 +175,12 @@ double _dywapitch_computeWaveletPitch(const double * samples, int startsample, i
 		int lastmaxIndex = -1000000;
 		int findMax = 0;
 		int findMin = 0;
-		for (i = 2; i < curSamNb; i++) {
+		for (i = 1; i < curSamNb; i++) {
 			si = sam[i] - theDC;
 			si1 = sam[i-1] - theDC;
 			
-			if (si1 <= 0 && si > 0) findMax = 1;
-			if (si1 >= 0 && si < 0) findMin = 1;
+			if (si1 <= 0 && si > 0) {findMax = 1; findMin = 0; }
+			if (si1 >= 0 && si < 0) {findMin = 1; findMax = 0; }
 			
 			// min or max ?
 			dv = si - si1;
@@ -185,10 +189,10 @@ double _dywapitch_computeWaveletPitch(const double * samples, int startsample, i
 				
 				if (findMin && previousDV < 0 && dv >= 0) { 
 					// minimum
-					if (fabs(si) >= ampltitudeThreshold) {
-						if (i > lastMinIndex + delta) {
-							mins[nbMins++] = i;
-							lastMinIndex = i;
+					if (fabs(si1) >= ampltitudeThreshold) {
+						if (i - 1 > lastMinIndex + delta) {
+							mins[nbMins++] = i - 1;
+							lastMinIndex = i - 1;
 							findMin = 0;
 							//if DEBUGG then put "min ok"&&si
 							//
@@ -204,10 +208,10 @@ double _dywapitch_computeWaveletPitch(const double * samples, int startsample, i
 				
 				if (findMax && previousDV > 0 && dv <= 0) {
 					// maximum
-					if (fabs(si) >= ampltitudeThreshold) {
-						if (i > lastmaxIndex + delta) {
-							maxs[nbMaxs++] = i;
-							lastmaxIndex = i;
+					if (fabs(si1) >= ampltitudeThreshold) {
+						if (i -1 > lastmaxIndex + delta) {
+							maxs[nbMaxs++] = i - 1;
+							lastmaxIndex = i - 1;
 							findMax = 0;
 						} else {
 							//if DEBUGG then put "max too close to previous"&&(i - lastmaxIndex)
@@ -284,7 +288,7 @@ double _dywapitch_computeWaveletPitch(const double * samples, int startsample, i
 				int nbDist = distances[bestDistance+j];
 				if (nbDist > 0) {
 					nbDists += nbDist;
-					distAvg += (double)(bestDistance+j)*nbDist;
+					distAvg += (bestDistance+j)*nbDist;
 				}
 			}
 		}
@@ -369,18 +373,18 @@ double _dywapitch_dynamicprocess(dywapitchtracker *pitchtracker, double pitch) {
 			pitchtracker->_prevPitch = pitch;
 			pitchtracker->_pitchConfidence = 1;
 			
-		} else if (fabs(pitchtracker->_prevPitch - pitch)/pitch < acceptedError) {
+		} else if (abs(pitchtracker->_prevPitch - pitch)/pitch < acceptedError) {
 			// similar : remember and increment pitch
 			pitchtracker->_prevPitch = pitch;
 			estimatedPitch = pitch;
 			pitchtracker->_pitchConfidence = min(maxConfidence, pitchtracker->_pitchConfidence + 1); // maximum 3
 			
-		} else if ((pitchtracker->_pitchConfidence >= maxConfidence-2) && fabs(pitchtracker->_prevPitch - 2.*pitch)/(2.*pitch) < acceptedError) {
+		} else if ((pitchtracker->_pitchConfidence >= maxConfidence-2) && abs(pitchtracker->_prevPitch - 2.*pitch)/(2.*pitch) < acceptedError) {
 			// close to half the last pitch, which is trusted
 			estimatedPitch = 2.*pitch;
 			pitchtracker->_prevPitch = estimatedPitch;
 			
-		} else if ((pitchtracker->_pitchConfidence >= maxConfidence-2) && fabs(pitchtracker->_prevPitch - 0.5*pitch)/(0.5*pitch) < acceptedError) {
+		} else if ((pitchtracker->_pitchConfidence >= maxConfidence-2) && abs(pitchtracker->_prevPitch - 0.5*pitch)/(0.5*pitch) < acceptedError) {
 			// close to twice the last pitch, which is trusted
 			estimatedPitch = 0.5*pitch;
 			pitchtracker->_prevPitch = estimatedPitch;
@@ -439,7 +443,7 @@ void dywapitch_inittracking(dywapitchtracker *pitchtracker) {
 	pitchtracker->_pitchConfidence = -1;
 }
 
-double dywapitch_computepitch(dywapitchtracker *pitchtracker, const double * samples, int startsample, int samplecount) {
+double dywapitch_computepitch(dywapitchtracker *pitchtracker, double * samples, int startsample, int samplecount) {
 	double raw_pitch = _dywapitch_computeWaveletPitch(samples, startsample, samplecount);
 	return _dywapitch_dynamicprocess(pitchtracker, raw_pitch);
 }
